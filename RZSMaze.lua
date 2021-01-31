@@ -16,9 +16,11 @@
 	of the maze, all the cells that were visited in the walk are converted to maze cells and a new walk begins,
 	starting from a random cell that belongs to the maze.
 
-	-- TODO: Insert link to page that shows this algorithm here
+	The following link demonstrates the algorithm nicely:
+		https://bl.ocks.org/mbostock/11357811
 
 	Do note that this means that purely theoretically, the algorithm may never finish.
+
 
 	Some technicalities you should probably know about:
 		1.	This generator uses tables to represent coordinates (and dimensions), WHERE THE MOST SIGNIFICANT COORDINATE IS FIRST.
@@ -65,8 +67,8 @@ end
 --[[--
 	Creates a shallow copy of an array-like table. Does not copy and dictionary keys.
 
-	@param table tbl
-	@return table
+	@param any[] tbl
+	@return any[]
 ]]
 local function copyTable(tbl)
 	local copy = {}
@@ -80,8 +82,8 @@ end
 --[[--
 	Creates a reversed shallow copy of an array-like table.
 
-	@param table tbl
-	@return table
+	@param any[] tbl
+	@return any[]
 ]]
 local function reverseTable(tbl)
 	local reversed = {}
@@ -134,7 +136,7 @@ end
 
 	@param any[] coordinates the table to validify
 	@return boolean whether a coordinate table is valid (2+ values, all values are integers)
-	@return string | nil an error message if the coordinates are not valid, or nil
+	@return string|nil an error message if the coordinates are not valid, or nil
 ]]
 local function validifyCoordinates(coordinates)
 	local numOfCoordinates = #coordinates
@@ -157,7 +159,7 @@ end
 
 	@param any[] dimensions the table to validify
 	@return boolean whether a dimensions table is valid (2+ values, all value are integers >= 2)
-	@return string | nil an error message if the coordinates are not valid, or nil
+	@return string|nil an error message if the coordinates are not valid, or nil
 ]]
 local function validifyDimensions(dimensions)
 	local numOfDimensions = #dimensions
@@ -176,13 +178,13 @@ local function validifyDimensions(dimensions)
 end
 
 --[[
-	Valifies the type of a value, printing a neat-ish error message.
+	Validifies the type of a value, printing a neat-ish error message.
 
 	@param string name the name of the value, for error-printing purposes
 	@param any value the value to validify
 	@param string expectedType a string as one that can be returned by type() that
 		the value should have
-	@param any | nil default a default value, which is returned if it is not nil
+	@param any|nil default a default value, which is returned if it is not nil
 		and the value is
 	@param function... any extra validation functions which should take the value as a parameter
 		and should return a success boolean and an error message
@@ -213,7 +215,7 @@ end
 --[[--
 	Returns a set of coordinates that's between two other coordinates.
 
-	The resuling coordinates may have decimals. This function is used solely in @{Maze:getSimpleRepresentation()}
+	The resulting coordinates may have decimals. This function is used solely in @{Maze:getSimpleRepresentation()}
 	where this case is handled (by multiplying by 2).
 
 	@param int[] coordinates1
@@ -235,10 +237,10 @@ end
 
 	@param int[] size a list of sizes in different dimensions, most significant first. The length of
 		this table also determines the nesting level
-	@param any | function either a default value to be used to initialize, or a function
+	@param any|function either a default value to be used to initialize, or a function
 		which is called for every element with the element's coordinates as an argument
 		and should return the value to be placed at that position.
-	@param?opt function if supplied, a function through which each subtable is passed before
+	@param[opt=nil] function if supplied, a function through which each subtable is passed before
 		it is returned. This function takes an any[] layer and an int depth as arguments and should
 		have one return value of the same type as objects the input array holds.
 ]]
@@ -374,7 +376,7 @@ end
 	Returns a Cell object that's adjacent to this one in a certain direction, if it exists.
 
 	@param int direction
-	@return Cell | nil
+	@return Cell|nil
 ]]
 function Cell:getAdjacentInDirection(direction)
 	return self._adjacentCells[direction]
@@ -405,7 +407,7 @@ end
 function Cell:getConnections()
 	local connections = {}
 	for direction = 1, self._numOfDimensions * 2 do
-		connections[direction] = self._connections[direction] == true -- Convert the nils to falses
+		connections[direction] = self._connections[direction] == true -- Convert any nil to a false
 	end
 	
 	return connections
@@ -475,7 +477,7 @@ end
 	Creates a connection in a direction.
 	This connection is one-way (it is not created from the adjacent Cell to this one).
 
-	@param ints direction the direction in which to create the connection
+	@param int direction the direction in which to create the connection
 ]]
 function Cell:connectDirection(direction)
 	self._connections[direction] = true
@@ -485,7 +487,7 @@ end
 	Creates a connection (@{Cell:connectDirection()}) in a direction and remembers it as the
 	direction in which the walk left this cell.
 
-	@param ints direction
+	@param int direction
 ]]
 function Cell:continueWalkInDirection(direction)
 	self:connectDirection(direction)
@@ -527,7 +529,7 @@ function Cell:leaveWalk()
 end
 
 --[[--
-	Sets the Cell's status to Maze and throws away any unnessesary data.
+	Sets the Cell's status to Maze and throws away any unnecessary data.
 ]]
 function Cell:joinMaze()
 	self._enterDirection = nil
@@ -547,18 +549,18 @@ local Maze = {}
 Maze.__index = Maze
 
 --[[--
-	Creates a new blank, ungenerated Maze of a certain size, optionally with a custom random generator.
+	Creates a new blank, un-generated Maze of a certain size, optionally with a custom random generator.
 
-	@param?opt={5, 5} int[] dimensions a list of the maze's dimensions, ordered with the least significant dimension (x)
+	@param[opt={5, 5}] int[] dimensions a list of the maze's dimensions, ordered with the least significant dimension (x)
 		first. Each dimension must be a positive integer greater than 2, and at least 2 values must be provided
-	@patam?opt=math.random function a random number generator function which has an interface identical
-		to math.random:
+	@param[opt=@{math.random}] function a random number generator function which has an interface identical
+		to @{math.random}:
 			* If no arguments are provided, returns a decimal in the range [0, 1),
 			* If one argument, n, is provided, returns an integer in the range [1, n],
 			* If two arguments, n and m, are provided, returns an integer in the range [n, m]
 		Additionally, this function can expect that n and m will always be positive integers greater than 0
 
-	@return Maze the ungenerated maze
+	@return Maze the un-generated maze
 ]]
 function Maze.new(dimensions, getRandom)
 	local self = setmetatable({}, Maze)
@@ -633,7 +635,7 @@ end
 
 	@param int[] coordinates the coordinates of the Cell to get
 
-	@return Cell | nil the Cell found at the coordinate, or nil if the coordinates are out of bounds
+	@return Cell|nil the Cell found at the coordinate, or nil if the coordinates are out of bounds
 ]]
 function Maze:_getCell(coordinates)
 	return getElementInMultiDTable(self._maze, coordinates)
@@ -740,10 +742,10 @@ end
 --[[--
 	Generates the Maze, optionally with some parameters. Has no effect if the Maze is already generated.
 
-	@param?opt=1 number completionTolerance a number between 0 and 1 which dictates the minimum %
+	@param[opt=1] number completionTolerance a number between 0 and 1 which dictates the minimum %
 		of the Maze to be generated
-	@param?opt={1, 1, ...} int[] the coordinates of the initial Cell, least significant coordinate first.
-		The amount of coordinates must match 
+	@param[opt={1, 1, ...}] int[] the coordinates of the initial Cell, least significant coordinate first.
+		The amount of coordinates must match the number of dimensions in the maze.
 		Defaults to the Cell who's every coordinate is 1
 
 	@return boolean whether the Maze generated successfully. False only if the Maze had been already generated
@@ -779,7 +781,7 @@ end
 --[[--
 	Randomly creates some connections between adjacent Cells.
 
-	@param?opt=0.2 float loopChance a number between 0 and 1, giving the % chance each Cell will attempt to connect
+	@param[opt=0.2] num loopChance a number between 0 and 1, giving the % chance each Cell will attempt to connect
 		to an adjacent one. A value of 1 does not guarantee that every Cell will be connected with every Cell,
 		and any value above 0 does not guarantee any new connections being made
 
@@ -874,7 +876,7 @@ end
 	@param function adjacentsInitializer a function which takes a value of the same time as returned by
 		the constructor function, as well as an array of similar objects where the index of each object
 		represents the direction in which that object is adjacent to the object passed as the first parameter
-	@param?opt=false boolean flipCoordinates whether the coordinates passed to the constructor function
+	@param[opt=false] boolean flipCoordinates whether the coordinates passed to the constructor function
 		should be flipped. By default, they are given with the most significant coordinate first
 ]]
 function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates)
@@ -918,7 +920,7 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates
 end
 
 --[[--
-	Returns the same output as @{Maze:toSimpleRepresentation()} but in human-readble string format, such as:
+	Returns the same output as @{Maze:toSimpleRepresentation()} but in human-readable string format, such as:
 
 	███████
 	█░░░█░█
@@ -930,8 +932,8 @@ end
 
 	If there are more than two dimensions, each "layer" is printed separately.
 
-	@param?opt=█ wallChar a string, usually a single character, to use to represent filled spaces
-	@param?opt=░ spaceChar a string, usually a single character, to use to represent empty spaces
+	@param[opt=█] wallChar a string, usually a single character, to use to represent filled spaces
+	@param[opt=░] spaceChar a string, usually a single character, to use to represent empty spaces
 	@return string
 
 	@see Maze:toSimpleRepresentation()
@@ -952,6 +954,7 @@ function Maze:toString(wallChar, spaceChar)
 		end
 	)
 end
+
 
 
 return Maze
