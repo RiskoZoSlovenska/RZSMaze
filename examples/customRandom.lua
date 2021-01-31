@@ -5,7 +5,7 @@
 	by Roblox (https://developer.roblox.com/en-us/api-reference/datatype/Random).
 ]]
 
-local Maze = require("RZSMazeGenerator")
+local RZSMaze = require("RZSMaze")
 
 
 local function getRandomGenerator(seed)
@@ -24,7 +24,7 @@ end
 
 
 local myRandom1 = getRandomGenerator(123)
-local myMaze1 = Maze.new({5, 5}, myRandom1)
+local myMaze1 = RZSMaze.new({5, 5}, myRandom1)
 myMaze1:generate()
 myMaze1:createLoops()
 print("Maze 1", myMaze1:toString())
@@ -32,7 +32,7 @@ print("Maze 1", myMaze1:toString())
 
 -- This maze will be different from the first one
 local myRandom2 = getRandomGenerator(456)
-local myMaze2 = Maze.new({5, 5}, myRandom2)
+local myMaze2 = RZSMaze.new({5, 5}, myRandom2)
 myMaze2:generate()
 myMaze2:createLoops()
 print("Maze 2", myMaze2:toString())
@@ -40,7 +40,7 @@ print("Maze 2", myMaze2:toString())
 
 -- This maze will be identical to the first one
 local myRandom3 = getRandomGenerator(123)
-local myMaze3 = Maze.new({5, 5}, myRandom3)
+local myMaze3 = RZSMaze.new({5, 5}, myRandom3)
 myMaze3:generate()
 myMaze3:createLoops()
 print("Maze 3", myMaze3:toString())

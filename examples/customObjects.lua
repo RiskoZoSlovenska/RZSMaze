@@ -2,7 +2,7 @@
 	This example should demonstrate the usage of the Maze:toCustomObjects() function.
 ]]
 
-local Maze = require("RZSMazeGenerator")
+local RZSMaze = require("RZSMaze")
 
 
 local Room = {} -- Custom class
@@ -50,7 +50,7 @@ function Room:addAdjacent(direction, adjacent)
 end
 
 
-local myMaze = Maze.new()
+local myMaze = RZSMaze.new()
 myMaze:generate()
 myMaze:createLoops()
 

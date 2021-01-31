@@ -1,6 +1,6 @@
 --[[--
 	@author RiskoZoSlovenska
-	@version 3
+	@version 3.1
 
 	A Lua maze generation library that uses the Loop-Erased Random Walk algorithm,
 	also known as Wilson's Algorithm, to create mazes.

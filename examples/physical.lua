@@ -2,7 +2,7 @@
 	This example should demonstrate usage of the Maze:toSimpleRepresentation() function.
 ]]
 
-local Maze = require("RZSMazeGenerator")
+local RZSMaze = require("RZSMaze")
 
 
 local function placeBlock(x, y)
@@ -10,7 +10,7 @@ local function placeBlock(x, y)
 end
 
 
-local myMaze = Maze.new({6, 6})
+local myMaze = RZSMaze.new({6, 6})
 myMaze:generate()
 myMaze:createLoops()
 for y, row in ipairs(myMaze:toSimpleRepresentation()) do
