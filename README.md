@@ -1,4 +1,4 @@
-# RZS Maze Generation
+# RZS Maze
 
 A Lua maze generation library that uses the [Loop-Erased Random Walk](https://bl.ocks.org/mbostock/11357811) algorithm,
 also known as Wilson's Algorithm, to create mazes.
