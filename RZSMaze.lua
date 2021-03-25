@@ -38,6 +38,10 @@
 			up. So a +1 shift in the x-axis is direction 1, a -1 shift is 2, a y+1 is 3, y-1 is 4 and so on.
 ]]
 
+local table, math, string = table, math, string
+local tostring = tostring
+local type, assert = type, assert
+local setmetatable = setmetatable
 
 
 --[[--
@@ -798,10 +802,13 @@ function Maze:createLoops(loopChance)
 
 	local loops = {}
 
-	for _, cell in ipairs(self._mazeCells) do
+	for cellIndex = 1, #self._mazeCells do
 		if self._random() < loopChance then
+			local cell = self._mazeCells[cellIndex]
+
 			local possibleLoopDirections = cell:getPossibleLoopDirections()
 			if #possibleLoopDirections > 0 then
+
 				local loopDirection = self:_getRandomOfList(possibleLoopDirections)
 				local adjacentCell = cell:getAdjacentInDirection(loopDirection)
 
@@ -853,10 +860,11 @@ function Maze:toSimpleRepresentation()
 		local cell = self:_getCell(coordinates)
 
 		-- For every connected adjacent Cell, get the space between that Cell and this Cell and set it to false.
-		for _, connectedCell in ipairs(cell:getConnectedCells()) do
+		local connectedCells = cell:getConnectedCells()
+		for connectedIndex = 1, #connectedCells do
 			setElementInMultiDTable(
 				simple,
-				multiplyTable(getMiddleCoordinates(coordinates, connectedCell.coordinates), 2),
+				multiplyTable(getMiddleCoordinates(coordinates, connectedCells[connectedIndex].coordinates), 2),
 				false
 			)
 		end
@@ -905,7 +913,8 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates
 		end
 	)
 
-	for _, object in ipairs(customObjects) do
+	for objectIndex = 1, #customObjects do
+		local object = customObjects[objectIndex]
 		local cell = self:_getCell(object.coordinates)
 		local cellAdjacentNumbers = cell:getAdjacentCellsNumbers()
 
