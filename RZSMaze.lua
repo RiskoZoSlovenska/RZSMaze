@@ -1,6 +1,9 @@
 --[[--
-	@author RiskoZoSlovenska
+	@module RZSMaze
 	@version 3.1
+	@author RiskoZoSlovenska
+	@date Feb 2021
+	@license MIT
 
 	A Lua maze generation library that uses the Loop-Erased Random Walk algorithm,
 	also known as Wilson's Algorithm, to create mazes.
@@ -220,7 +223,7 @@ end
 
 	@param int[] coordinates1
 	@param int[] coordinates2
-	@return number[] 
+	@return number[]
 ]]
 local function getMiddleCoordinates(coordinates1, coordinates2)
 	local middleCoordinates = {}
