@@ -59,6 +59,7 @@ end
 
 	@param int size the size of the table to create
 	@param any defaultValue the value to initialize the table with
+
 	@return any[]
 ]]
 local function createTable(size, defaultValue)
@@ -108,6 +109,7 @@ end
 
 	@param number[] tbl the table of numbers to multiply
 	@param number num the number to multiply each element by
+
 	@return number[]
 ]]
 local function multiplyTable(tbl, num)
@@ -125,6 +127,7 @@ end
 
 	@param number[] tbl the table of numbers to add to
 	@param number num the number to add each to element
+
 	@return number[]
 ]]
 local function addTable(tbl, num)
@@ -142,6 +145,7 @@ end
 	Used to validify user input.
 
 	@param any[] coordinates the table to validify
+
 	@return boolean whether a coordinate table is valid (2+ values, all values are integers)
 	@return string|nil an error message if the coordinates are not valid, or nil
 ]]
@@ -165,6 +169,7 @@ end
 	Used to validify user input.
 
 	@param any[] dimensions the table to validify
+
 	@return boolean whether a dimensions table is valid (2+ values, all value are integers >= 2)
 	@return string|nil an error message if the coordinates are not valid, or nil
 ]]
@@ -197,7 +202,6 @@ end
 		and should return a success boolean and an error message
 
 	@return any the passed value if it is valid
-
 	@throws Invalid argument exception
 ]]
 local function validifyInput(name, value, expectedType, default, ...)
@@ -227,6 +231,7 @@ end
 
 	@param int[] coordinates1
 	@param int[] coordinates2
+
 	@return number[]
 ]]
 local function getMiddleCoordinates(coordinates1, coordinates2)
@@ -242,14 +247,16 @@ end
 --[[--
 	Creates a new multi-dimensional table initialized with a custom value.
 
-	@param int[] size a list of sizes in different dimensions, most significant first. The length of
+	@param int[] dimensions a list of sizes in different dimensions, most significant first. The length of
 		this table also determines the nesting level
-	@param any|function either a default value to be used to initialize, or a function
+	@param any|function core either a default value to be used to initialize, or a function
 		which is called for every element with the element's coordinates as an argument
 		and should return the value to be placed at that position.
-	@param[opt=nil] function if supplied, a function through which each subtable is passed before
+	@param[opt=nil] layerProcessFunction function if supplied, a function through which each subtable is passed before
 		it is returned. This function takes an any[] layer and an int depth as arguments and should
 		have one return value of the same type as objects the input array holds.
+
+	@return table the constructed table
 ]]
 local function constructMultiDTable(dimensions, core, layerProcessFunction)
 	local isCoreFunction = type(core) == "function"
@@ -288,6 +295,7 @@ end
 
 	@param table tbl the multi-dimensional table
 	@param int[] indexes the coordinates of the element
+
 	@return any the retrieved value, or nil
 ]]
 local function getElementInMultiDTable(tbl, indexes)
@@ -302,7 +310,7 @@ end
 --[[--
 	Sets an element of a multi-dimensional (nested) table according to the element's coordinates.
 
-	Unlike @{getElementInMultiDTable()}, throws an error of the coordinates are out of bounds
+	Unlike @{getElementInMultiDTable()}, will error of the coordinates are out of bounds.
 
 	@param table tbl the multi-dimensional table
 	@param int[] indexes the coordinates of the element
@@ -342,6 +350,8 @@ Cell.__index = Cell
 
 	@param int num this Cell's number. Used only for identification
 	@param int[] coordinates this Cell's coordinates
+
+	@return Cell
 ]]
 function Cell.new(num, coordinates)
 	local self = setmetatable({}, Cell)
@@ -416,7 +426,7 @@ function Cell:getConnections()
 	for direction = 1, self._numOfDimensions * 2 do
 		connections[direction] = self._connections[direction] == true -- Convert any nil to a false
 	end
-	
+
 	return connections
 end
 
@@ -536,7 +546,7 @@ function Cell:leaveWalk()
 end
 
 --[[--
-	Sets the Cell's status to Maze and throws away any unnecessary data.
+	Sets the Cell's status to Maze and discards away any unnecessary data.
 ]]
 function Cell:joinMaze()
 	self._enterDirection = nil
@@ -560,7 +570,7 @@ Maze.__index = Maze
 
 	@param[opt={5, 5}] int[] dimensions a list of the maze's dimensions, ordered with the least significant dimension (x)
 		first. Each dimension must be a positive integer greater than 2, and at least 2 values must be provided
-	@param[opt=@{math.random}] function a random number generator function which has an interface identical
+	@param[opt=@{math.random}] function getRandom a random number generator function which has an interface identical
 		to @{math.random}:
 			* If no arguments are provided, returns a decimal in the range [0, 1),
 			* If one argument, n, is provided, returns an integer in the range [1, n],
@@ -629,7 +639,7 @@ end
 	Returns a random element from a list.
 
 	@param any[] list
-	@param any a random value picked from the list
+	@return any a random value picked from the list
 ]]
 function Maze:_getRandomOfList(list)
 	return list[self._random(#list)]
@@ -641,7 +651,6 @@ end
 	Wrapper for @{getElementInMultiDTable()}
 
 	@param int[] coordinates the coordinates of the Cell to get
-
 	@return Cell|nil the Cell found at the coordinate, or nil if the coordinates are out of bounds
 ]]
 function Maze:_getCell(coordinates)
@@ -751,13 +760,11 @@ end
 
 	@param[opt=1] number completionTolerance a number between 0 and 1 which dictates the minimum %
 		of the Maze to be generated
-	@param[opt={1, 1, ...}] int[] the coordinates of the initial Cell, least significant coordinate first.
+	@param[opt={1, 1, ...}] int[] startCoordinates the coordinates of the initial Cell, least significant coordinate first.
 		The amount of coordinates must match the number of dimensions in the maze.
 		Defaults to the Cell who's every coordinate is 1
 
-	@return boolean whether the Maze generated successfully. False only if the Maze had been already generated
-
-
+	@throws Maze already generated exception
 ]]
 function Maze:generate(completionTolerance, startCoordinates)
 	assert(not self._mazeCells[1], "Maze has already been generated!")
@@ -884,11 +891,13 @@ end
 		* boolean[] a list of booleans where a true under index n means that the object is connected
 			to another in Direction n.
 		This function also has to return a value
-	@param function adjacentsInitializer a function which takes a value of the same time as returned by
+	@param function adjacentsInitializer a function which takes a value of the same type as returned by
 		the constructor function, as well as an array of similar objects where the index of each object
 		represents the direction in which that object is adjacent to the object passed as the first parameter
 	@param[opt=false] boolean flipCoordinates whether the coordinates passed to the constructor function
 		should be flipped. By default, they are given with the most significant coordinate first
+
+	@return table a nested array of the custom objects
 ]]
 function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates)
 	constructor = validifyInput("constructor", constructor, "function")
@@ -926,8 +935,6 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates
 		adjacentsInitializer(object, adjacents)
 	end
 
-
-
 	return customMaze
 end
 
@@ -944,11 +951,12 @@ end
 
 	If there are more than two dimensions, each "layer" is printed separately.
 
+	@see Maze:toSimpleRepresentation()
+
 	@param[opt=█] wallChar a string, usually a single character, to use to represent filled spaces
 	@param[opt=░] spaceChar a string, usually a single character, to use to represent empty spaces
-	@return string
 
-	@see Maze:toSimpleRepresentation()
+	@return string
 ]]
 function Maze:toString(wallChar, spaceChar)
 	wallChar = validifyInput("wallChar", wallChar, "string", '█')
