@@ -23,19 +23,6 @@
 		https://bl.ocks.org/mbostock/11357811
 
 	Do note that this means that purely theoretically, the algorithm may never finish.
-
-
-	Some technicalities you should probably know about:
-		1.	This generator uses tables to represent coordinates (and dimensions), WHERE THE MOST SIGNIFICANT COORDINATE IS FIRST.
-			So coordinates in the form (x, y, z) would be represented as {z, y, x}, unless otherwise specified - two functions
-			specifically accept coordinates/dimensions where the least significant dimension is first, and these are the
-			@{Maze.new()} and @{Maze:generate()} functions. @{Maze:toCustomObjects()} also has a third optional parameter that
-			allows for reversing the dimensions tables. Additionally, the __tostring() method(s) for the Maze/Cell objects also
-			return coordinates/dimensions with the least significant dimension first.
-
-		2.	This generator also represents directions with positive integers, where an odd number is a +1 shift and an even number
-			is a -1 shift in the nth least significant coordinate, where n is given by diving the direction number by 2 and rounding
-			up. So a +1 shift in the x-axis is direction 1, a -1 shift is 2, a y+1 is 3, y-1 is 4 and so on.
 ]]
 
 local table, math, string = table, math, string
@@ -85,23 +72,6 @@ local function copyTable(tbl)
 	end
 
 	return copy
-end
-
---[[--
-	Creates a reversed shallow copy of an array-like table.
-
-	@param any[] tbl
-	@return any[]
-]]
-local function reverseTable(tbl)
-	local reversed = {}
-	local len = #tbl
-
-	for index = 1, len do
-		reversed[len - index + 1] = tbl[index]
-	end
-
-	return reversed
 end
 
 --[[--
@@ -376,7 +346,7 @@ end
 	@return string a string describing this Cell
 ]]
 function Cell:__tostring()
-	return string.format("Cell #%d (%s)", self.number, table.concat(reverseTable(self.coordinates), ", "))
+	return string.format("Cell #%d (%s)", self.number, table.concat(self.coordinates, ", "))
 end
 
 --[[--
@@ -568,8 +538,8 @@ Maze.__index = Maze
 --[[--
 	Creates a new blank, un-generated Maze of a certain size, optionally with a custom random generator.
 
-	@param[opt={5, 5}] int[] dimensions a list of the maze's dimensions, ordered with the least significant dimension (x)
-		first. Each dimension must be a positive integer greater than 2, and at least 2 values must be provided
+	@param[opt={5, 5}] int[] dimensions a list of the maze's dimensions. Each dimension must be a positive integer greater than 2, and at
+		least 2 values must be provided
 	@param[opt=@{math.random}] function getRandom a random number generator function which has an interface identical
 		to @{math.random}:
 			* If no arguments are provided, returns a decimal in the range [0, 1),
@@ -582,7 +552,7 @@ Maze.__index = Maze
 function Maze.new(dimensions, getRandom)
 	local self = setmetatable({}, Maze)
 
-	self.dimensions = reverseTable(validifyInput("dimensions", dimensions, "table", {5, 5}, validifyDimensions))
+	self.dimensions = copyTable(validifyInput("dimensions", dimensions, "table", {5, 5}, validifyDimensions))
 	self._numOfDimensions = #self.dimensions
 
 	self._random = validifyInput("getRandom", getRandom, "function", math.random)
@@ -617,7 +587,7 @@ function Maze.new(dimensions, getRandom)
 
 			local direction = dimensionIndex * 2
 			adjacents[direction - 1] = self:_getCell(adjacentCoordinates)
-			adjacents[direction]	 = self:_getCell(oppAdjacentCoordinates)
+			adjacents[direction    ] = self:_getCell(oppAdjacentCoordinates)
 		end
 
 
@@ -631,7 +601,7 @@ end
 	@return string a string describing the maze
 ]]
 function Maze:__tostring()
-	return string.format("Maze (%s)", table.concat(reverseTable(self.dimensions), ", "))
+	return string.format("Maze (%s)", table.concat(self.dimensions, ", "))
 end
 
 
@@ -760,7 +730,7 @@ end
 
 	@param[opt=1] number completionTolerance a number between 0 and 1 which dictates the minimum %
 		of the Maze to be generated
-	@param[opt={1, 1, ...}] int[] startCoordinates the coordinates of the initial Cell, least significant coordinate first.
+	@param[opt={1, 1, ...}] int[] startCoordinates the coordinates of the initial Cell.
 		The amount of coordinates must match the number of dimensions in the maze.
 		Defaults to the Cell who's every coordinate is 1
 
@@ -771,7 +741,7 @@ function Maze:generate(completionTolerance, startCoordinates)
 
 	do
 		local startCell = self:_getCell(
-			reverseTable(validifyInput("startCoordinates", startCoordinates, "table", createTable(self._numOfDimensions, 1), validifyCoordinates))
+			validifyInput("startCoordinates", startCoordinates, "table", createTable(self._numOfDimensions, 1), validifyCoordinates)
 		)
 		assert(startCell and type(startCell) == "table" and startCell.number, "Invalid coordinates (Coordinates out of bounds)!") -- Meh
 
@@ -801,8 +771,7 @@ end
 
 	@return table[] a list of dictionaries each holding data about a created loop, in the format
 		{coordinates = int[], direction = int} where coordinates is a coordinates table of a Cell
-		(least significant dimension first) and direction indicates in which direction the connection
-		was created
+		and direction indicates in which direction the connection was created
 ]]
 function Maze:createLoops(loopChance)
 	loopChance = validifyInput("loopChance", loopChance, "number", 0.1)
@@ -823,7 +792,7 @@ function Maze:createLoops(loopChance)
 				adjacentCell:connectDirection(getOppositeDirection(loopDirection))
 
 				table.insert(loops, {
-					coordinates = reverseTable(cell.coordinates),
+					coordinates = copyTable(cell.coordinates),
 					direction = loopDirection
 				})
 			end
@@ -894,15 +863,12 @@ end
 	@param function adjacentsInitializer a function which takes a value of the same type as returned by
 		the constructor function, as well as an array of similar objects where the index of each object
 		represents the direction in which that object is adjacent to the object passed as the first parameter
-	@param[opt=false] boolean flipCoordinates whether the coordinates passed to the constructor function
-		should be flipped. By default, they are given with the most significant coordinate first
 
 	@return table a nested array of the custom objects
 ]]
-function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates)
+function Maze:toCustomObjects(constructor, adjacentsInitializer)
 	constructor = validifyInput("constructor", constructor, "function")
 	adjacentsInitializer = validifyInput("adjacentsInitializer", adjacentsInitializer, "function")
-	flipCoordinates = validifyInput("flipCoordinates", flipCoordinates, "boolean", false)
 
 	local customObjects = {}
 
@@ -912,7 +878,7 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer, flipCoordinates
 			local cell = self:_getCell(coordinates)
 
 			local object = constructor(
-				flipCoordinates and reverseTable(cell.coordinates) or cell.coordinates,
+				copyTable(cell.coordinates),
 				cell.number,
 				cell:getConnections()
 			)
