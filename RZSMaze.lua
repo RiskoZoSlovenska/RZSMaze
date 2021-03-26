@@ -346,7 +346,7 @@ end
 	@return string a string describing this Cell
 ]]
 function Cell:__tostring()
-	return string.format("Cell #%d (%s)", self.number, table.concat(self.coordinates, ", "))
+	return string.format("RZSMazeCell (#%d %s)", self.number, table.concat(self.coordinates, ", "))
 end
 
 --[[--
@@ -602,7 +602,7 @@ end
 	@return string a string describing the maze
 ]]
 function Maze:__tostring()
-	return string.format("Maze (%s)", table.concat(self.dimensions, ", "))
+	return string.format("RZSMaze (%s, %sgenerated)", table.concat(self.dimensions, "x"), self._isGenerated and "" or "un")
 end
 
 
