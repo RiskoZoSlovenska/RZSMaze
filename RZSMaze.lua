@@ -760,7 +760,7 @@ end
 
 ]]
 function Maze:generate(completionTolerance, startCoordinates)
-	assert(#self._mazeCells == 0, "Maze has already been generated!")
+	assert(not self._mazeCells[1], "Maze has already been generated!")
 
 	do
 		local startCell = self:_getCell(
