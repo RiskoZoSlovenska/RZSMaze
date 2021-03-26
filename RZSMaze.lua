@@ -774,7 +774,7 @@ end
 		and direction indicates in which direction the connection was created
 ]]
 function Maze:createLoops(loopChance)
-	loopChance = validifyInput("loopChance", loopChance, "number", 0.1)
+	loopChance = validifyInput("loopChance", loopChance, "number", 0.2)
 
 	local loops = {}
 
