@@ -1,6 +1,6 @@
 --[[--
 	@module RZSMaze
-	@version 3.1
+	@version 3.2
 	@author RiskoZoSlovenska
 	@date Feb 2021
 	@license MIT
