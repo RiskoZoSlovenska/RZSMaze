@@ -570,6 +570,7 @@ function Maze.new(dimensions, getRandom)
 		)
 	end
 	self._mazeCells = {}
+	self._isGenerated = false
 
 	-- Init cell adjacents
 	for coordinates in self:_iterateCoordinates() do
@@ -737,7 +738,7 @@ end
 	@throws Maze already generated exception
 ]]
 function Maze:generate(completionTolerance, startCoordinates)
-	assert(not self._mazeCells[1], "Maze has already been generated!")
+	assert(not self._isGenerated, "Maze has already been generated!")
 
 	do
 		local startCell = self:_getCell(
@@ -745,6 +746,7 @@ function Maze:generate(completionTolerance, startCoordinates)
 		)
 		assert(startCell and type(startCell) == "table" and startCell.number, "Invalid coordinates (Coordinates out of bounds)!") -- Meh
 
+		self._isGenerated = true
 		startCell:joinMaze()
 		self._mazeCells[1] = startCell
 	end
