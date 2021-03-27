@@ -765,27 +765,33 @@ function Maze:generate(completionTolerance, startCoordinates)
 end
 
 --[[--
-	Randomly creates some connections between adjacent Cells.
+	Randomly creates connections between adjacent Cells, trying to reach a set percentage of cells.
 
-	@param[opt=0.2] num loopChance a number between 0 and 1, giving the % chance each Cell will attempt to connect
-		to an adjacent one. A value of 1 does not guarantee that every Cell will be connected with every Cell,
-		and any value above 0 does not guarantee any new connections being made
+	@param[opt=0.2] number loopPercentage a number between 0 and 1, giving the % of cells that will attempt to make an extra connection
+		to an adjacent cell. In some cases, such as this number being quite high, the desired percentage will not be achieved.
+		Recommended to be set to numbers less than 0.4
+	@param[opt=5] number maxAttempts the maximum number of attempts to take when attempting to create an extra connection. Attempts
+		may fail when there are already many connections
 
 	@return table[] a list of dictionaries each holding data about a created loop, in the format
 		{coordinates = int[], direction = int} where coordinates is a coordinates table of a Cell
 		and direction indicates in which direction the connection was created
 ]]
-function Maze:createLoops(loopChance)
-	loopChance = validifyInput("loopChance", loopChance, "number", 0.2)
+function Maze:createLoops(loopPercentage, maxAttempts)
+	loopPercentage = validifyInput("loopPercentage", loopPercentage, "number", 0.2)
+	maxAttempts = validifyInput("maxAttempts", maxAttempts, "number", 5)
 
 	local loops = {}
 
-	for cellIndex = 1, #self._mazeCells do
-		if self._random() < loopChance then
-			local cell = self._mazeCells[cellIndex]
+	for _ = 1, math.ceil(#self._mazeCells * loopPercentage) do
+		local success, attempts = false, 0
+
+		while not success do
+			-- Choose random Cell and try to create a connection in a walled direction
+			local cell = self:_getRandomOfList(self._mazeCells)
 
 			local possibleLoopDirections = cell:getPossibleLoopDirections()
-			if #possibleLoopDirections > 0 then
+			if #possibleLoopDirections > 0 then -- This is pretty much the only case where we fail
 
 				local loopDirection = self:_getRandomOfList(possibleLoopDirections)
 				local adjacentCell = cell:getAdjacentInDirection(loopDirection)
@@ -797,8 +803,15 @@ function Maze:createLoops(loopChance)
 					coordinates = copyTable(cell.coordinates),
 					direction = loopDirection
 				})
+				success = true
+
+			else
+				attempts = attempts + 1
+				if attempts >= maxAttempts then break end
 			end
 		end
+
+		if attempts >= maxAttempts then break end -- Small DRY violation but eh
 	end
 
 	return loops

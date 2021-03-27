@@ -57,7 +57,7 @@ Despite the code being documented using comments, I haven't gotten around yet to
 The module returns an `RZSMaze` class, which has the following functions:
 * `RZSMaze.new(dimensions, randomFunc)` which creates a new blank `RZSMaze`,
 * `RZSMaze:generate(completionTolerance, startCoordinates)` which generates a maze,
-* `RZSMaze:createLoops(loopChance)` which randomly creates loops in the generated maze,
+* `RZSMaze:createLoops(loopPercentage, maxAttempts)` which randomly creates loops in the generated maze,
 * `RZSMaze:toSimpleRepresentation()` which creates a simple boolean representation of the maze,
 * `RZSMaze:toCustomObjects(constructor, adjacentsInitializer)` which lets you export the maze to a custom representation, and lastly,
 * `RZSMaze:toString(wallChar, spaceChar)` which returns the maze in a human-readable format.
@@ -93,10 +93,14 @@ RZSMaze:generate(completionTolerance, startCoordinates)
 
 
 RZSMaze:createLoops(loopChance)
-	* loopChance - a number between 0 and 1, giving the % chance each Cell will attempt to connect
-		to an adjacent one. A value of 1 does not guarantee that every Cell will be connected with every Cell,
-		and any value above 0 does not guarantee any new connections being made.
+	* loopPercentage - a number between 0 and 1, giving the % of cells that will attempt to make an extra
+		connection to an adjacent cell. In some cases, such as this number being quite high, the desired
+		percentage will not be achieved.
+		Recommended to be set to numbers less than 0.4.
 		Optional, defaults to 0.2
+	* maxAttempts - the maximum number of attempts to take when attempting to create an extra connection.
+		Attempts may fail when there are already many connections.
+		Optional, defaults to 5.
 
 	Returns:
 	* a list of dictionaries each holding data about a created loop, in the format
