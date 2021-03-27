@@ -873,6 +873,7 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer)
 	adjacentsInitializer = validifyInput("adjacentsInitializer", adjacentsInitializer, "function")
 
 	local customObjects = {}
+	local objectsCoordinates = {} -- We have to remember coordinates manually :c
 
 	local customMaze = constructMultiDTable(
 		self.dimensions,
@@ -886,13 +887,14 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer)
 			)
 
 			customObjects[cell.number] = object
+			objectsCoordinates[object] = cell.coordinates
 			return object
 		end
 	)
 
 	for objectIndex = 1, #customObjects do
 		local object = customObjects[objectIndex]
-		local cell = self:_getCell(object.coordinates)
+		local cell = self:_getCell(objectsCoordinates[object])
 		local cellAdjacentNumbers = cell:getAdjacentCellsNumbers()
 
 		local adjacents = {}
