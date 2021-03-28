@@ -586,7 +586,7 @@ function Maze.new(dimensions, getRandom)
 			local oppAdjacentCoordinates = copyTable(coordinates)
 			oppAdjacentCoordinates[dimensionIndex] = oppAdjacentCoordinates[dimensionIndex] - 1 -- Likewise, one unit back
 
-			local direction = dimensionIndex * 2
+			local direction = (self._numOfDimensions - dimensionIndex + 1) * 2
 			adjacents[direction - 1] = self:_getCell(adjacentCoordinates)
 			adjacents[direction    ] = self:_getCell(oppAdjacentCoordinates)
 		end
