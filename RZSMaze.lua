@@ -808,6 +808,10 @@ function Maze:createLoops(loopPercentage, maxAttempts)
 
 			attempts = attempts + 1
 		end
+
+		-- We've tried the maximum number of Cells and none of them worked, most likely
+		-- the other Cells in the maze aren't going to work either, so break.
+		if attempts >= maxAttempts then break end
 	end
 
 	return loops
