@@ -784,14 +784,14 @@ function Maze:createLoops(loopPercentage, maxAttempts)
 	local loops = {}
 
 	for _ = 1, math.ceil(#self._mazeCells * loopPercentage) do
-		local success, attempts = false, 0
+		local attempts = 0;
 
-		while not success do
+		while attempts < maxAttempts do
 			-- Choose random Cell and try to create a connection in a walled direction
 			local cell = self:_getRandomOfList(self._mazeCells)
 
 			local possibleLoopDirections = cell:getPossibleLoopDirections()
-			if #possibleLoopDirections > 0 then -- This is pretty much the only case where we fail
+			if #possibleLoopDirections > 0 then -- This is pretty much the only case we have to handle
 
 				local loopDirection = self:_getRandomOfList(possibleLoopDirections)
 				local adjacentCell = cell:getAdjacentInDirection(loopDirection)
@@ -803,15 +803,11 @@ function Maze:createLoops(loopPercentage, maxAttempts)
 					coordinates = copyTable(cell.coordinates),
 					direction = loopDirection
 				})
-				success = true
-
-			else
-				attempts = attempts + 1
-				if attempts >= maxAttempts then break end
+				break -- We can break the attempts loop
 			end
-		end
 
-		if attempts >= maxAttempts then break end -- Small DRY violation but eh
+			attempts = attempts + 1
+		end
 	end
 
 	return loops
@@ -897,6 +893,7 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer)
 				copyTable(cell.coordinates),
 				cell.number,
 				cell:getConnections()
+				-- TODO: Support for custom extra ... args
 			)
 
 			customObjects[cell.number] = object
