@@ -14,7 +14,7 @@ also known as Wilson's Algorithm, to create mazes.
 
 ## Installation
 
-Coming to [LuaRocks](https://luarocks.org) and [lit](https://github.com/luvit/lit) soon.
+Coming to [LuaRocks](https://luarocks.org) soon.
 
 Can also be found on [Roblox](https://www.roblox.com/library/6189563378/RZSMaze).
 
@@ -83,16 +83,16 @@ RZSMaze.new(dimensions, randomFunc)
 RZSMaze:generate(completionTolerance, startCoordinates)
 	* completionTolerance - a number between 0 and 1 which dictates the minimum % of the Maze to be generated.
 		Optional, defaults to 1.
-	* startCoordinates - the coordinates of the initial Cell. The amount of coordinates must match the number
+	* startCoordinates - the coordinates of the initial cell. The amount of coordinates must match the number
 		of dimensions in the maze.
-		Optional, defaults to the Cell who's every coordinate is 1.
+		Optional, defaults to the coordinates of the top-left-most cell ({1, 1, ...}).
 	
 	Returns:
 	* Nothing
 
 
 
-RZSMaze:createLoops(loopChance)
+RZSMaze:createLoops(loopPercentage, maxAttempts)
 	* loopPercentage - a number between 0 and 1, giving the % of cells that will attempt to make an extra
 		connection to an adjacent cell. In some cases, such as this number being quite high, the desired
 		percentage will not be achieved.
@@ -105,11 +105,7 @@ RZSMaze:createLoops(loopChance)
 	Returns:
 	* a list of dictionaries each holding data about a created loop, in the format
 		{coordinates = int[], direction = int} where coordinates is a coordinates table of a Cell
-		and direction indicates in which direction the connection
-		was created.
-		
-	Returns:
-	* Nothing
+		and direction indicates in which direction the connection was created.
 
 
 
@@ -148,8 +144,8 @@ RZSMaze:toCustomObjects(constructor, adjacentsInitializer)
 			* int[] coordinates an array of coordinate values
 			* int number a unique number which designates the object
 			* boolean[] a list of booleans where a true under index n means that the object is connected
-				to another in Direction n.
-		This function also has to return a value.
+				to another in direction n.
+		This function also has to return some value.
 	* adjacentsInitializer - a function which takes a value of the same type as returned by
 		the constructor function, as well as an array of similar objects where the index of each object
 		represents the direction in which that object is adjacent to the object passed as the first parameter.
@@ -166,7 +162,7 @@ RZSMaze:toString(wallChar, spaceChar)
 		Optional, defaults to the ░ character.
 	
 	Returns:
-	* A string in human-readable format which shows the maze
+	* A string in human-readable format which displays the maze
 	
 	Example:
 	
