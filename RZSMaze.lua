@@ -923,6 +923,46 @@ function Maze:toCustomObjects(constructor, adjacentsInitializer)
 end
 
 --[[--
+	Returns the shortest path from a starting position to a finishing position in the maze.
+
+	@param[opt={2, 2}] positionStart An optional table representing the starting position. Defaults to {2, 2}.
+	@param[opt] positionFinish An optional table representing the finishing position. If not provided, it defaults to the opposite corner of the maze.
+
+	@return table|nil Returns a table containing the shortest path as a sequence of positions (tables), or nil if no path is found.
+]]
+
+function Maze:getNearSolution(positionStart, positionFinish)
+	local maze = self:toSimpleRepresentation()
+    local queue = {}
+    local visited = {}
+    local directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
+    local start = positionStart or {2, 2}
+    local goal = positionFinish or {#maze-1, #maze[1]-1}
+    table.insert(queue, {start})
+    visited[start[1]] = {[start[2]] = true}
+    while #queue > 0 do
+        local path = table.remove(queue, 1)
+        local current = path[#path]
+        if current[1] == goal[1] and current[2] == goal[2] then
+            return path
+        end
+        for _, dir in ipairs(directions) do
+            local nextX, nextY = current[1] + dir[1], current[2] + dir[2]
+            if nextX >= 1 and nextX <= #maze and nextY >= 1 and nextY <= #maze[1] and not maze[nextX][nextY] then
+                if not visited[nextX] or not visited[nextX][nextY] then
+                    visited[nextX] = visited[nextX] or {}
+                    visited[nextX][nextY] = true
+                    local newPath = {unpack(path)}
+                    table.insert(newPath, {nextX, nextY})
+                    table.insert(queue, newPath)
+                end
+            end
+        end
+    end
+    return nil 
+end
+
+--[[--
 	Returns the same output as @{Maze:toSimpleRepresentation()} but in human-readable string format, such as:
 
 	███████
@@ -958,7 +998,5 @@ function Maze:toString(wallChar, spaceChar)
 		end
 	)
 end
-
-
 
 return Maze

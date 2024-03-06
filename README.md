@@ -154,6 +154,13 @@ RZSMaze:toCustomObjects(constructor, adjacentsInitializer)
 	* A nested array of the custom objects
 
 
+RZSMaze:getNearSolution(positionStart, positionFinish)
+    * positionStart - Optional starting position coordinates {x, y}. Defaults to {2, 2}.
+    * positionFinish - Optional finishing position coordinates {x, y}. Defaults to the bottom-right corner.
+
+	Returns:
+    * A list of coordinates representing the path from the starting position to the finishing position, if found. Otherwise, returns nil.
+
 
 RZSMaze:toString(wallChar, spaceChar)
 	* wallChar - a string, usually a single character, to use to represent filled spaces.
