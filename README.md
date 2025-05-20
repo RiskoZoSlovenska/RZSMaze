@@ -14,7 +14,10 @@ also known as Wilson's Algorithm, to create mazes.
 
 ## Installation
 
-Coming to [LuaRocks](https://luarocks.org) soon.
+Get it from [LuaRocks](https://luarocks.org):
+```
+luarocks install RZSMaze
+```
 
 Can also be found on [Roblox](https://www.roblox.com/library/6189563378/RZSMaze).
 
@@ -33,8 +36,8 @@ print(myMaze:toString())
 
 ## Usage and Docs
 
-#### First of all, two IMPORTANT caveats:
-1.	Tables are used to represent coordinates (and dimensions), **WHERE THE MOST SIGNIFICANT COORDINATE IS FIRST**.
+#### First of all, two important notes:
+1.	Tables are used to represent coordinates (and dimensions), **where the most significant coordinate is first**.
 	In other words, coordinates/dimensions in the form (x, y, z) would be represented as {z, y, x}.
 
 2.	Directions are represented with positive integers, where an odd number is a +1 shift and an even number is a -1 shift in the *n<sup>th</sup>* least significant coordinate, where *n* is given by diving the direction number by 2 and rounding up. To illustrate:
